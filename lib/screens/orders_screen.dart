@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/order_bloc.dart';
@@ -74,10 +75,17 @@ class _OrdersScreenState extends State<OrdersScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           print('Bouton d\'ajout pressé');
-          // Action pour ajouter un bon de commande
+          final hardcodedOrder = {
+            'clientName': 'Commande Test',
+            'reservationDate': Timestamp.now(), // Timestamp Firestore
+            'driverId': 'driver1',
+            'validated': false,
+          };
+          context.read<OrderBloc>().add(AddOrder(hardcodedOrder));
         },
         child: Icon(Icons.add),
       ),
+
     );
   }
 }

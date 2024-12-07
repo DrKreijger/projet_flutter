@@ -24,4 +24,15 @@ class OrderRepository {
   Future<void> deleteOrder(String orderId) async {
     await firestore.collection('orders').doc(orderId).delete();
   }
+
+  Future<void> addOrder(Map<String, dynamic> orderData) async {
+    try {
+      await firestore.collection('orders').add(orderData);
+      print('Commande ajoutée avec succès : $orderData');
+    } catch (e) {
+      print('Erreur lors de l\'ajout dans Firestore : $e');
+      throw e;
+    }
+  }
+
 }

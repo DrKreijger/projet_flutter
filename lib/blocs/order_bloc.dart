@@ -8,21 +8,36 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
 
   OrderBloc(this.orderRepository) : super(OrdersLoading()) {
     on<LoadOrders>((event, emit) async {
+      print('LoadOrders déclenché');
       try {
-        print('Chargement des commandes...');
+        emit(OrdersLoading());
         final orders = await orderRepository.fetchOrders();
         print('Commandes récupérées : ${orders.length}');
         emit(OrdersLoaded(orders));
       } catch (e) {
-        print('Erreur dans OrderBloc : $e');
-        emit(OrdersLoading()); // Ou un état d'erreur personnalisé
+        print('Erreur dans LoadOrders : $e');
+        emit(OrdersError('Une erreur s\'est produite.'));
       }
     });
+
 
 
     on<DeleteOrder>((event, emit) async {
       await orderRepository.deleteOrder(event.orderId);
       add(LoadOrders());
     });
+
+    on<AddOrder>((event, emit) async {
+      try {
+        print('Ajout d\'une commande : ${event.orderData}');
+        await orderRepository.addOrder(event.orderData);
+        // Rafraîchir la liste après ajout
+        add(LoadOrders());
+      } catch (e) {
+        print('Erreur lors de l\'ajout de la commande : $e');
+        emit(OrdersError('Impossible d\'ajouter la commande.'));
+      }
+    });
+
   }
 }
