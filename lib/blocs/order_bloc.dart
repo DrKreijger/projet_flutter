@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'order_event.dart';
 import 'order_state.dart';
@@ -8,19 +9,18 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
 
   OrderBloc(this.orderRepository) : super(OrdersLoading()) {
     on<LoadOrders>((event, emit) async {
-      print('LoadOrders déclenché');
       try {
         emit(OrdersLoading());
         final orders = await orderRepository.fetchOrders();
-        print('Commandes récupérées : ${orders.length}');
+
+        // Trier les commandes par date dans l'ordre croissant (anciennes d'abord)
+        orders.sort((a, b) => a.reservationDate.compareTo(b.reservationDate));
+
         emit(OrdersLoaded(orders));
       } catch (e) {
-        print('Erreur dans LoadOrders : $e');
-        emit(OrdersError('Une erreur s\'est produite.'));
+        emit(OrdersError('Une erreur s\'est produite lors du chargement des commandes.'));
       }
     });
-
-
 
     on<DeleteOrder>((event, emit) async {
       await orderRepository.deleteOrder(event.orderId);
@@ -36,6 +36,16 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       } catch (e) {
         print('Erreur lors de l\'ajout de la commande : $e');
         emit(OrdersError('Impossible d\'ajouter la commande.'));
+      }
+    });
+
+    on<UpdateOrderValidation>((event, emit) async {
+      try {
+        final docRef = FirebaseFirestore.instance.collection('orders').doc(event.orderId);
+        await docRef.update({'validated': event.newValidationState});
+        add(LoadOrders()); // Recharge les commandes pour mettre à jour l'interface
+      } catch (e) {
+        emit(OrdersError('Erreur lors de la mise à jour de la validation : $e'));
       }
     });
 

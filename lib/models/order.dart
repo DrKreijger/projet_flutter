@@ -4,6 +4,7 @@ class Order {
   final String id;
   final String clientName;
   final DateTime reservationDate;
+  final DateTime departureDate;
   final String driverId;
   final bool validated;
 
@@ -11,6 +12,7 @@ class Order {
     required this.id,
     required this.clientName,
     required this.reservationDate,
+    required this.departureDate,
     required this.driverId,
     required this.validated,
   });
@@ -20,6 +22,7 @@ class Order {
       id: id,
       clientName: map['clientName'] ?? 'Inconnu',
       reservationDate: (map['reservationDate'] as Timestamp).toDate(), // Convertit Timestamp en DateTime
+      departureDate: (map['departureDate'] as Timestamp).toDate(), // Convertit Timestamp en DateTime
       driverId: map['driverId'] ?? '',
       validated: map['validated'] ?? false,
     );
@@ -29,6 +32,7 @@ class Order {
     return {
       'clientName': clientName,
       'reservationDate': reservationDate,
+      'departureDate': departureDate,
       'driverId': driverId,
       'validated': validated,
     };

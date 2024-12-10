@@ -5,11 +5,14 @@ import 'blocs/order_bloc.dart';
 import 'repositories/order_repository.dart';
 import 'screens/orders_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/standalone.dart' as tz;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   print('Firebase a été initialisé avec succès.');
+  tz.initializeTimeZones();
   runApp(MyApp());
 }
 

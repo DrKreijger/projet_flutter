@@ -4,11 +4,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/order_bloc.dart';
 import '../blocs/order_event.dart';
 import '../blocs/order_state.dart';
+import 'package:intl/intl.dart';
+import 'package:timezone/standalone.dart' as tz;
 
 class OrdersScreen extends StatefulWidget {
   @override
   _OrdersScreenState createState() => _OrdersScreenState();
 }
+
+String formatDateTimeToBelgium(DateTime dateTime) {
+  final tz.TZDateTime belgiumTime = tz.TZDateTime.from(dateTime, tz.getLocation('Europe/Brussels'));
+  return DateFormat('dd/MM/yyyy HH:mm').format(belgiumTime);
+}
+
 
 class _OrdersScreenState extends State<OrdersScreen> {
   @override
@@ -51,14 +59,53 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 final order = state.orders[index];
                 print('Commande affichée : ${order.clientName}, ID: ${order.id}');
                 return ListTile(
-                  title: Text(order.clientName),
-                  subtitle: Text(order.reservationDate.toIso8601String()),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      print('Suppression de la commande ID: ${order.id}');
-                      context.read<OrderBloc>().add(DeleteOrder(order.id));
-                    },
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0), // Augmente l'espacement
+                  title: Text(order.clientName), // Nom du client
+                  subtitle: Text(
+                    formatDateTimeToBelgium(order.reservationDate),
+                    style: TextStyle(color: Colors.grey, fontSize: 12), // Date sous le nom
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min, // Évite que la `Row` prenne tout l'espace horizontal
+                    mainAxisAlignment: MainAxisAlignment.center, // Centre les icônes horizontalement
+                    children: [
+                      // Icône de validation (cliquable)
+                      IconButton(
+                        padding: EdgeInsets.zero, // Supprime les marges internes
+                        constraints: BoxConstraints(), // Réduit les contraintes
+                        icon: Icon(
+                          order.validated ? Icons.check_circle : Icons.cancel,
+                          color: order.validated ? Colors.green : Colors.red,
+                          size: 20, // Taille de l'icône
+                        ),
+                        onPressed: () {
+                          print('Changement d\'état de validation pour la commande ID: ${order.id}');
+                          // Inversion de l'état de validation
+                          context.read<OrderBloc>().add(UpdateOrderValidation(order.id, !order.validated));
+                        },
+                      ),
+                      const SizedBox(width: 16), // Espacement entre les icônes
+                      // Icône de suppression
+                      IconButton(
+                        padding: EdgeInsets.zero, // Supprime les marges internes
+                        constraints: BoxConstraints(), // Réduit les contraintes
+                        icon: Icon(Icons.delete, color: Colors.red, size: 20),
+                        onPressed: () {
+                          print('Suppression de la commande ID: ${order.id}');
+                          context.read<OrderBloc>().add(DeleteOrder(order.id));
+                        },
+                      ),
+                      const SizedBox(width: 8), // Espacement entre les icônes
+                      // Icône d'édition
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
+                        icon: Icon(Icons.edit, color: Colors.blue, size: 20),
+                        onPressed: () {
+                          print('Édition de la commande ID: ${order.id}');
+                        },
+                      ),
+                    ],
                   ),
                 );
               },
@@ -78,6 +125,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           final hardcodedOrder = {
             'clientName': 'Commande Test',
             'reservationDate': Timestamp.now(), // Timestamp Firestore
+            'departureDate': Timestamp.now(),
             'driverId': 'driver1',
             'validated': false,
           };
@@ -85,7 +133,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
         },
         child: Icon(Icons.add),
       ),
-
     );
   }
 }
