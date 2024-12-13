@@ -49,5 +49,16 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       }
     });
 
+    on<UpdateOrder>((event, emit) async {
+      try {
+        final docRef = FirebaseFirestore.instance.collection('orders').doc(event.orderId);
+        await docRef.update(event.updatedData);
+        add(LoadOrders()); // Recharge les commandes pour mettre à jour l'interface
+      } catch (e) {
+        emit(OrdersError('Erreur lors de la mise à jour de la commande : $e'));
+      }
+    });
+
+
   }
 }

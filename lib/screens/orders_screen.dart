@@ -7,6 +7,8 @@ import '../blocs/order_state.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/standalone.dart' as tz;
 
+import 'order_form_screen.dart';
+
 class OrdersScreen extends StatefulWidget {
   @override
   _OrdersScreenState createState() => _OrdersScreenState();
@@ -98,11 +100,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       const SizedBox(width: 8), // Espacement entre les icônes
                       // Icône d'édition
                       IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: BoxConstraints(),
                         icon: Icon(Icons.edit, color: Colors.blue, size: 20),
                         onPressed: () {
-                          print('Édition de la commande ID: ${order.id}');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => OrderFormScreen(order: order),
+                            ),
+                          );
                         },
                       ),
                     ],
@@ -121,15 +126,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          print('Bouton d\'ajout pressé');
-          final hardcodedOrder = {
-            'clientName': 'Commande Test',
-            'reservationDate': Timestamp.now(), // Timestamp Firestore
-            'departureDate': Timestamp.now(),
-            'driverId': 'driver1',
-            'validated': false,
-          };
-          context.read<OrderBloc>().add(AddOrder(hardcodedOrder));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const OrderFormScreen()),
+          );
         },
         child: Icon(Icons.add),
       ),

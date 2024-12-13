@@ -18,3 +18,11 @@ class UpdateOrderValidation extends OrderEvent {
   UpdateOrderValidation(this.orderId, this.newValidationState);
 }
 
+class UpdateOrder extends OrderEvent {
+  final String orderId;
+  final Map<String, dynamic> updatedData;
+
+  UpdateOrder(this.orderId, this.updatedData);
+}
+
+
