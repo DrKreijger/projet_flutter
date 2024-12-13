@@ -1,12 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/order_bloc.dart';
 import '../blocs/order_event.dart';
 import '../blocs/order_state.dart';
+import '../repositories/driver_repository.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/standalone.dart' as tz;
-
 import 'order_form_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -19,8 +18,9 @@ String formatDateTimeToBelgium(DateTime dateTime) {
   return DateFormat('dd/MM/yyyy HH:mm').format(belgiumTime);
 }
 
-
 class _OrdersScreenState extends State<OrdersScreen> {
+  final DriverRepository driverRepository = DriverRepository(); // Repository pour gérer les chauffeurs
+
   @override
   void initState() {
     super.initState();
@@ -64,7 +64,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0), // Augmente l'espacement
                   title: Text(order.clientName), // Nom du client
                   subtitle: Text(
-                    formatDateTimeToBelgium(order.reservationDate),
+                    formatDateTimeToBelgium(order.departureDate),
                     style: TextStyle(color: Colors.grey, fontSize: 12), // Date sous le nom
                   ),
                   trailing: Row(
@@ -101,11 +101,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       // Icône d'édition
                       IconButton(
                         icon: Icon(Icons.edit, color: Colors.blue, size: 20),
-                        onPressed: () {
+                        onPressed: () async {
+                          // Récupère les chauffeurs avant d'ouvrir le formulaire
+                          final drivers = await driverRepository.fetchDrivers();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => OrderFormScreen(order: order),
+                              builder: (_) => OrderFormScreen(order: order, drivers: drivers),
                             ),
                           );
                         },
@@ -125,10 +127,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
+          // Récupère les chauffeurs avant d'ouvrir le formulaire
+          final drivers = await driverRepository.fetchDrivers();
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const OrderFormScreen()),
+            MaterialPageRoute(
+              builder: (_) => OrderFormScreen(drivers: drivers),
+            ),
           );
         },
         child: Icon(Icons.add),
