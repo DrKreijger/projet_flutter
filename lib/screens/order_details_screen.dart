@@ -37,7 +37,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         if (state is OrdersLoaded) {
           // Mettre à jour les détails si la commande a été modifiée
           final updatedOrder = state.orders.firstWhere(
-                (o) => o.id == order.id,
+            (o) => o.id == order.id,
             orElse: () => order,
           );
           setState(() {
@@ -56,14 +56,28 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             children: [
               Text(
                 'Client : ${order.clientName}',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              Text('Date de réservation : ${order.reservationDate}'),
+              Text(
+                'Date de réservation : ${formatDateTimeToBelgium(order.reservationDate)}',
+                style: const TextStyle(fontSize: 16),
+              ),
               const SizedBox(height: 8),
-              Text('Date de départ : ${order.departureDate}'),
+              Text(
+                'Date de départ : ${formatDateTimeToBelgium(order.departureDate)}',
+                style: const TextStyle(fontSize: 16),
+              ),
               const SizedBox(height: 8),
-              Text('État de validation : ${order.validated ? "Validé" : "Non validé"}'),
+              Text(
+                'État de validation : ${order.validated ? "Validé" : "Non validé"}',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: order.validated ? Colors.green : Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
         ),
@@ -73,7 +87,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => OrderFormScreen(order: order, drivers: widget.drivers),
+                builder: (_) =>
+                    OrderFormScreen(order: order, drivers: widget.drivers),
               ),
             ).then((_) {
               // Émettre un événement pour recharger les commandes après l'édition
