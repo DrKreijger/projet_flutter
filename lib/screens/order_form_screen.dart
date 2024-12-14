@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/order_bloc.dart';
 import '../blocs/order_event.dart';
+import '../models/driver.dart';
 import '../models/order.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/standalone.dart' as tz;
 
-
 class OrderFormScreen extends StatefulWidget {
-  final Order? order; // Si null, on est en mode ajout, sinon en mode édition
-  final List<Map<String, String>> drivers; // Liste des chauffeurs avec leur ID, nom, prénom
+  final Order? order;
+  final List<Driver> drivers;
 
   const OrderFormScreen({Key? key, this.order, required this.drivers}) : super(key: key);
 
@@ -36,7 +36,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     _clientNameController = TextEditingController(text: widget.order?.clientName ?? '');
     _reservationDate = widget.order?.reservationDate ?? DateTime.now();
     _departureDate = widget.order?.departureDate ?? DateTime.now();
-    _selectedDriverId = widget.order?.driverId;
+    _selectedDriverId = widget.order?.driverId ?? (widget.drivers.isNotEmpty ? widget.drivers[0].id : null);
     _validated = widget.order?.validated ?? false;
   }
 
@@ -85,10 +85,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       };
 
       if (widget.order == null) {
-        // Mode ajout
         context.read<OrderBloc>().add(AddOrder(orderData));
       } else {
-        // Mode édition
         context.read<OrderBloc>().add(UpdateOrder(widget.order!.id, orderData));
       }
 
@@ -150,11 +148,10 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                 // Sélecteur de chauffeur
                 DropdownButtonFormField<String>(
                   value: _selectedDriverId,
-                  decoration: const InputDecoration(labelText: 'Chauffeur'),
                   items: widget.drivers.map((driver) {
-                    return DropdownMenuItem<String>(
-                      value: driver['id'], // ID du chauffeur
-                      child: Text('${driver['firstName']} ${driver['lastName']}'),
+                    return DropdownMenuItem(
+                      value: driver.id,
+                      child: Text('${driver.firstName} ${driver.lastName}'), // Affiche le nom complet
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -162,12 +159,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                       _selectedDriverId = value;
                     });
                   },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez sélectionner un chauffeur';
-                    }
-                    return null;
-                  },
+                  decoration: const InputDecoration(labelText: 'Chauffeur'),
                 ),
                 const SizedBox(height: 16),
                 // Switch pour la validation

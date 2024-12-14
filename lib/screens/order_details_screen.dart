@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/standalone.dart' as tz;
 import '../models/order.dart';
+import '../models/driver.dart';
 import 'order_form_screen.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final Order order; // La commande sélectionnée
-  final List<Map<String, String>> drivers; // Liste des chauffeurs avec leurs informations
+  final List<Driver> drivers; // Liste des chauffeurs avec leurs informations
 
   const OrderDetailsScreen({Key? key, required this.order, required this.drivers}) : super(key: key);
 
@@ -15,17 +16,24 @@ class OrderDetailsScreen extends StatelessWidget {
     return DateFormat('dd/MM/yyyy HH:mm').format(belgiumTime);
   }
 
-  // Méthode pour obtenir le nom et prénom du chauffeur
-  String getDriverName(String driverId) {
-    final driver = drivers.firstWhere(
-          (d) => d['id'] == driverId,
-      orElse: () => {'firstName': 'Inconnu', 'lastName': 'Chauffeur'},
+  // Méthode pour obtenir le chauffeur correspondant
+  Driver getDriver(String driverId) {
+    return drivers.firstWhere(
+          (d) => d.id == driverId,
+      orElse: () => Driver(
+        id: '',
+        firstName: 'Inconnu',
+        lastName: 'Chauffeur',
+        email: '',
+        phone: '',
+      ),
     );
-    return '${driver['firstName']} ${driver['lastName']}';
   }
 
   @override
   Widget build(BuildContext context) {
+    final driver = getDriver(order.driverId);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Détails de la commande'),
@@ -53,7 +61,7 @@ class OrderDetailsScreen extends StatelessWidget {
             const SizedBox(height: 8),
             // Affichage du chauffeur assigné
             Text(
-              'Chauffeur assigné : ${getDriverName(order.driverId)}',
+              'Chauffeur assigné : ${driver.firstName} ${driver.lastName}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),

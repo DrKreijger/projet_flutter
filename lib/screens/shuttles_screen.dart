@@ -3,41 +3,32 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/order_bloc.dart';
 import '../blocs/order_event.dart';
 import '../blocs/order_state.dart';
-import '../repositories/driver_repository.dart';
+import '../models/order.dart';
+import 'order_form_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/standalone.dart' as tz;
-import 'order_details_screen.dart';
-import 'order_form_screen.dart';
 
-class OrdersScreen extends StatefulWidget {
-  @override
-  _OrdersScreenState createState() => _OrdersScreenState();
-}
+class ShuttlesScreen extends StatelessWidget {
+  final String driverId; // ID du chauffeur pour lequel afficher les navettes
+  final String driverName; // Nom complet du chauffeur (prénom + nom)
 
-String formatDateTimeToBelgium(DateTime dateTime) {
-  final tz.TZDateTime belgiumTime = tz.TZDateTime.from(dateTime, tz.getLocation('Europe/Brussels'));
-  return DateFormat('dd/MM/yyyy HH:mm').format(belgiumTime);
-}
+  const ShuttlesScreen({Key? key, required this.driverId, required this.driverName}) : super(key: key);
 
-class _OrdersScreenState extends State<OrdersScreen> {
-  final DriverRepository driverRepository = DriverRepository();
-
-  @override
-  void initState() {
-    super.initState();
-    context.read<OrderBloc>().add(LoadOrders());
+  String formatDateTimeToBelgium(DateTime dateTime) {
+    final tz.TZDateTime belgiumTime = tz.TZDateTime.from(dateTime, tz.getLocation('Europe/Brussels'));
+    return DateFormat('dd/MM/yyyy HH:mm').format(belgiumTime);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Bons de commande'),
+        title: Text('Navettes de $driverName'),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh),
             onPressed: () {
-              context.read<OrderBloc>().add(LoadOrders());
+              context.read<OrderBloc>().add(LoadOrders()); // Recharger toutes les commandes
             },
           ),
         ],
@@ -45,30 +36,27 @@ class _OrdersScreenState extends State<OrdersScreen> {
       body: BlocBuilder<OrderBloc, OrderState>(
         builder: (context, state) {
           if (state is OrdersLoading) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is OrdersError) {
+            return Center(child: Text('Erreur : ${state.message}'));
           } else if (state is OrdersLoaded) {
-            if (state.orders.isEmpty) {
-              return Center(child: Text('Aucun bon de commande trouvé.'));
+            // Filtrer les commandes associées au chauffeur
+            final filteredOrders = state.orders.where((order) => order.driverId == driverId).toList();
+
+            if (filteredOrders.isEmpty) {
+              return const Center(child: Text('Aucune navette trouvée pour ce chauffeur.'));
             }
+
             return ListView.builder(
-              itemCount: state.orders.length,
+              itemCount: filteredOrders.length,
               itemBuilder: (context, index) {
-                final order = state.orders[index];
+                final order = filteredOrders[index];
                 return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Ajoute un padding uniforme
-                  onTap: () async {
-                    final drivers = await driverRepository.fetchDrivers();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => OrderDetailsScreen(order: order, drivers: drivers),
-                      ),
-                    );
-                  },
-                  title: Text(order.clientName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Uniformise le padding
+                  title: Text(order.clientName, style: const TextStyle(fontWeight: FontWeight.bold)), // Nom du client
                   subtitle: Text(
-                    formatDateTimeToBelgium(order.departureDate),
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                    formatDateTimeToBelgium(order.departureDate), // Date de départ
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -84,6 +72,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             color: order.validated ? Colors.green : Colors.red,
                           ),
                           onPressed: () {
+                            print('Changement d\'état de validation pour la commande ID: ${order.id}');
                             context.read<OrderBloc>().add(UpdateOrderValidation(order.id, !order.validated));
                           },
                         ),
@@ -95,13 +84,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         height: 40,
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          icon: Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () async {
-                            final drivers = await driverRepository.fetchDrivers();
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => OrderFormScreen(order: order, drivers: drivers),
+                                builder: (_) => OrderFormScreen(order: order, drivers: []),
                               ),
                             );
                           },
@@ -114,8 +102,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         height: 40,
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          icon: Icon(Icons.delete, color: Colors.red),
+                          icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () {
+                            print('Suppression de la commande ID: ${order.id}');
                             context.read<OrderBloc>().add(DeleteOrder(order.id));
                           },
                         ),
@@ -125,24 +114,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 );
               },
             );
-          } else if (state is OrdersError) {
-            return Center(child: Text('Erreur : ${state.message}'));
           } else {
-            return Center(child: Text('État inconnu.'));
+            return const Center(child: Text('Erreur inconnue.'));
           }
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final drivers = await driverRepository.fetchDrivers();
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => OrderFormScreen(drivers: drivers),
-            ),
-          );
-        },
-        child: Icon(Icons.add),
       ),
     );
   }
