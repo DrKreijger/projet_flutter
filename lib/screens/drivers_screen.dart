@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/driver_bloc.dart';
+import '../models/driver.dart';
 import 'driver_form_screen.dart';
+import 'driver_details_screen.dart';
 import 'shuttles_screen.dart';
 
 class DriversScreen extends StatelessWidget {
@@ -24,7 +26,7 @@ class DriversScreen extends StatelessWidget {
           if (state is DriversLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is DriversLoaded) {
-            final drivers = state.drivers; // Liste des chauffeurs de type `Driver`
+            final drivers = state.drivers; // Liste des chauffeurs
             if (drivers.isEmpty) {
               return const Center(child: Text('Aucun chauffeur trouvé.'));
             }
@@ -33,61 +35,49 @@ class DriversScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final driver = drivers[index];
                 return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Ajoute un padding uniforme
+                  onTap: () {
+                    // Ouvrir les détails du chauffeur
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DriverDetailsScreen(driver: driver),
+                      ),
+                    );
+                  },
                   title: Text('${driver.firstName} ${driver.lastName}', style: const TextStyle(fontWeight: FontWeight.bold)),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Bouton des navettes
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: Icon(Icons.directions_bus, color: Colors.purple),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ShuttlesScreen(
-                                  driverId: driver.id,
-                                  driverName: '${driver.firstName} ${driver.lastName}',
-                                ),
+                      IconButton(
+                        icon: const Icon(Icons.directions_bus, color: Colors.purple),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ShuttlesScreen(
+                                driverId: driver.id,
+                                driverName: '${driver.firstName} ${driver.lastName}',
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        },
                       ),
-                      const SizedBox(width: 8), // Espacement entre les boutons
-                      // Bouton d'édition
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => DriverFormScreen(driver: driver),
-                              ),
-                            );
-                          },
-                        ),
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => DriverFormScreen(driver: driver),
+                            ),
+                          );
+                        },
                       ),
-                      const SizedBox(width: 8), // Espacement entre les boutons
-                      // Bouton de suppression
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: Icon(Icons.delete, color: Colors.red),
-                          onPressed: () {
-                            _showDeleteConfirmation(context, driver.id);
-                          },
-                        ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          _showDeleteConfirmation(context, driver.id);
+                        },
                       ),
                     ],
                   ),
