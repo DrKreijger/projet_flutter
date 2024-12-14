@@ -6,6 +6,7 @@ import '../blocs/order_state.dart';
 import '../repositories/driver_repository.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/standalone.dart' as tz;
+import 'order_details_screen.dart';
 import 'order_form_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -61,48 +62,52 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 final order = state.orders[index];
                 print('Commande affichée : ${order.clientName}, ID: ${order.id}');
                 return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0), // Augmente l'espacement
-                  title: Text(order.clientName), // Nom du client
+                  onTap: () async {
+                    // Récupère les chauffeurs depuis le DriverRepository
+                    final drivers = await driverRepository.fetchDrivers();
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OrderDetailsScreen(order: order, drivers: drivers),
+                      ),
+                    );
+                  },
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+                  title: Text(order.clientName),
                   subtitle: Text(
                     formatDateTimeToBelgium(order.departureDate),
-                    style: TextStyle(color: Colors.grey, fontSize: 12), // Date sous le nom
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                   trailing: Row(
-                    mainAxisSize: MainAxisSize.min, // Évite que la `Row` prenne tout l'espace horizontal
-                    mainAxisAlignment: MainAxisAlignment.center, // Centre les icônes horizontalement
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Icône de validation (cliquable)
                       IconButton(
-                        padding: EdgeInsets.zero, // Supprime les marges internes
-                        constraints: BoxConstraints(), // Réduit les contraintes
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
                         icon: Icon(
                           order.validated ? Icons.check_circle : Icons.cancel,
                           color: order.validated ? Colors.green : Colors.red,
-                          size: 20, // Taille de l'icône
+                          size: 20,
                         ),
                         onPressed: () {
-                          print('Changement d\'état de validation pour la commande ID: ${order.id}');
-                          // Inversion de l'état de validation
                           context.read<OrderBloc>().add(UpdateOrderValidation(order.id, !order.validated));
                         },
                       ),
-                      const SizedBox(width: 16), // Espacement entre les icônes
-                      // Icône de suppression
+                      const SizedBox(width: 16),
                       IconButton(
-                        padding: EdgeInsets.zero, // Supprime les marges internes
-                        constraints: BoxConstraints(), // Réduit les contraintes
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
                         icon: Icon(Icons.delete, color: Colors.red, size: 20),
                         onPressed: () {
-                          print('Suppression de la commande ID: ${order.id}');
                           context.read<OrderBloc>().add(DeleteOrder(order.id));
                         },
                       ),
-                      const SizedBox(width: 8), // Espacement entre les icônes
-                      // Icône d'édition
+                      const SizedBox(width: 8),
                       IconButton(
                         icon: Icon(Icons.edit, color: Colors.blue, size: 20),
                         onPressed: () async {
-                          // Récupère les chauffeurs avant d'ouvrir le formulaire
                           final drivers = await driverRepository.fetchDrivers();
                           Navigator.push(
                             context,
