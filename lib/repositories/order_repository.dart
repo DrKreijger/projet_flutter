@@ -5,7 +5,8 @@ import '../models/order.dart' as customOrder;
 class OrderRepository {
   final FirebaseFirestore firestore;
 
-  OrderRepository({required this.firestore});
+  OrderRepository({FirebaseFirestore? firestore})
+      : firestore = firestore ?? FirebaseFirestore.instance;
 
   Future<List<customOrder.Order>> fetchOrders() async {
     try {
@@ -34,5 +35,15 @@ class OrderRepository {
       throw e;
     }
   }
+
+  Future<customOrder.Order?> fetchOrderById(String orderId) async {
+    final snapshot = await firestore.collection('orders').doc(orderId).get();
+    if (snapshot.exists) {
+      final data = snapshot.data()!;
+      return customOrder.Order.fromMap(data, snapshot.id);
+    }
+    return null;
+  }
+
 
 }
