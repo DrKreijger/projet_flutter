@@ -76,21 +76,22 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
 
   void _saveForm() {
     if (_formKey.currentState!.validate()) {
-      final orderData = {
-        'clientName': _clientNameController.text,
-        'reservationDate': _reservationDate,
-        'departureDate': _departureDate,
-        'driverId': _selectedDriverId,
-        'validated': _validated,
-      };
+      final newOrder = Order(
+        id: widget.order?.id ?? '',
+        clientName: _clientNameController.text,
+        reservationDate: _reservationDate,
+        departureDate: _departureDate,
+        driverId: _selectedDriverId ?? '',
+        validated: _validated,
+      );
 
       if (widget.order == null) {
-        context.read<OrderBloc>().add(AddOrder(orderData));
+        context.read<OrderBloc>().add(OrderAdd(newOrder: newOrder));
       } else {
-        context.read<OrderBloc>().add(UpdateOrder(widget.order!.id, orderData));
+        context.read<OrderBloc>().add(OrderUpdate(orderId: newOrder.id, updatedOrder: newOrder));
       }
 
-      Navigator.pop(context); // Retour à l'écran précédent
+      Navigator.pop(context, true); // Retourne `true` pour indiquer qu'une modification a été effectuée
     }
   }
 
@@ -121,7 +122,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                 // Nom du client
                 TextFormField(
                   controller: _clientNameController,
-                  decoration: InputDecoration(labelText: 'Nom du client'),
+                  decoration: const InputDecoration(labelText: 'Nom du client'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Veuillez entrer un nom de client';
@@ -138,7 +139,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                     TextButton(
                       onPressed: _pickDateAndTime,
                       child: Text(
-                        formatDateTimeToBelgium(_departureDate), // Affichage formaté
+                        formatDateTimeToBelgium(_departureDate),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -151,7 +152,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                   items: widget.drivers.map((driver) {
                     return DropdownMenuItem(
                       value: driver.id,
-                      child: Text('${driver.firstName} ${driver.lastName}'), // Affiche le nom complet
+                      child: Text('${driver.firstName} ${driver.lastName}'),
                     );
                   }).toList(),
                   onChanged: (value) {

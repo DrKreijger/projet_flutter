@@ -36,14 +36,6 @@ class OrderRepository {
     }
   }
 
-  Future<customOrder.Order?> fetchOrderById(String orderId) async {
-    final snapshot = await firestore.collection('orders').doc(orderId).get();
-    if (snapshot.exists) {
-      final data = snapshot.data()!;
-      return customOrder.Order.fromMap(data, snapshot.id);
-    }
-    return null;
-  }
 
   Future<void> updateOrderValidation(String orderId, bool newValidationState) async {
     await firestore.collection('orders').doc(orderId).update({'validated': newValidationState});

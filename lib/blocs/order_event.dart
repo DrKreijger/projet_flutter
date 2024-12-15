@@ -1,28 +1,36 @@
+import '../models/order.dart';
+
 abstract class OrderEvent {}
 
-class LoadOrders extends OrderEvent {}
+/// Événement pour charger toutes les commandes
+class OrderLoad extends OrderEvent {}
 
-class DeleteOrder extends OrderEvent {
+/// Événement pour supprimer une commande
+class OrderDelete extends OrderEvent {
   final String orderId;
-  DeleteOrder(this.orderId);
-}
-class AddOrder extends OrderEvent {
-  final Map<String, dynamic> orderData; // Les données de la commande
-  AddOrder(this.orderData);
+
+  OrderDelete({required this.orderId});
 }
 
-class UpdateOrderValidation extends OrderEvent {
+/// Événement pour ajouter une nouvelle commande
+class OrderAdd extends OrderEvent {
+  final Order newOrder;
+
+  OrderAdd({required this.newOrder});
+}
+
+/// Événement pour mettre à jour l'état de validation d'une commande
+class OrderUpdateValidation extends OrderEvent {
   final String orderId;
-  final bool newValidationState;
+  final bool isValid;
 
-  UpdateOrderValidation(this.orderId, this.newValidationState);
+  OrderUpdateValidation({required this.orderId, required this.isValid});
 }
 
-class UpdateOrder extends OrderEvent {
+/// Événement pour mettre à jour une commande existante
+class OrderUpdate extends OrderEvent {
   final String orderId;
-  final Map<String, dynamic> updatedData;
+  final Order updatedOrder;
 
-  UpdateOrder(this.orderId, this.updatedData);
+  OrderUpdate({required this.orderId, required this.updatedOrder});
 }
-
-

@@ -30,19 +30,25 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     order = widget.order;
   }
 
+  void _updateOrderDetails(BuildContext context) {
+    final blocState = context.read<OrderBloc>().state;
+    if (blocState is OrdersLoaded) {
+      final updatedOrder = blocState.orders.firstWhere(
+            (o) => o.id == order.id,
+        orElse: () => order,
+      );
+      setState(() {
+        order = updatedOrder;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<OrderBloc, OrderState>(
       listener: (context, state) {
         if (state is OrdersLoaded) {
-          // Mettre à jour les détails si la commande a été modifiée
-          final updatedOrder = state.orders.firstWhere(
-            (o) => o.id == order.id,
-            orElse: () => order,
-          );
-          setState(() {
-            order = updatedOrder;
-          });
+          _updateOrderDetails(context);
         }
       },
       child: Scaffold(
@@ -56,8 +62,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             children: [
               Text(
                 'Client : ${order.clientName}',
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
@@ -84,20 +89,27 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             // Naviguer vers le formulaire d'édition
-            Navigator.push(
+            final result = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) =>
                     OrderFormScreen(order: order, drivers: widget.drivers),
               ),
-            ).then((_) {
-              // Émettre un événement pour recharger les commandes après l'édition
-              context.read<OrderBloc>().add(LoadOrders());
-            });
+            );
+
+            // Recharger les commandes si une mise à jour a été effectuée
+            if (result == true) {
+              context.read<OrderBloc>().add(OrderLoad());
+            }
           },
           child: const Icon(Icons.edit),
         ),
       ),
     );
+  }
+
+  String formatDateTimeToBelgium(DateTime dateTime) {
+    // Implémenter la logique de formatage
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}';
   }
 }

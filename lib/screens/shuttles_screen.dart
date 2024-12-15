@@ -29,7 +29,7 @@ class ShuttlesScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              context.read<OrderBloc>().add(LoadOrders());
+              context.read<OrderBloc>().add(OrderLoad()); // Utiliser le nouvel événement `OrderLoad`
             },
           ),
         ],
@@ -94,7 +94,7 @@ class ShuttlesScreen extends StatelessWidget {
                                 onPressed: () {
                                   context
                                       .read<OrderBloc>()
-                                      .add(UpdateOrderValidation(order.id, !order.validated));
+                                      .add(OrderUpdateValidation(orderId: order.id, isValid: !order.validated));
                                 },
                               ),
                               const SizedBox(width: 8),
@@ -113,7 +113,7 @@ class ShuttlesScreen extends StatelessWidget {
                               IconButton(
                                 icon: const Icon(Icons.delete, color: Colors.red),
                                 onPressed: () {
-                                  context.read<OrderBloc>().add(DeleteOrder(order.id));
+                                  context.read<OrderBloc>().add(OrderDelete(orderId: order.id));
                                 },
                               ),
                             ],
