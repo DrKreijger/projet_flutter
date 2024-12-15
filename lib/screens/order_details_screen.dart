@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:timezone/timezone.dart' as tz;
 import '../blocs/order_event.dart';
 import '../models/order.dart';
 import '../models/driver.dart';
@@ -88,7 +89,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            // Naviguer vers le formulaire d'édition
             final result = await Navigator.push(
               context,
               MaterialPageRoute(
@@ -97,7 +97,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               ),
             );
 
-            // Recharger les commandes si une mise à jour a été effectuée
             if (result == true) {
               context.read<OrderBloc>().add(OrderLoad());
             }
@@ -109,7 +108,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   }
 
   String formatDateTimeToBelgium(DateTime dateTime) {
-    // Implémenter la logique de formatage
-    return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}';
+    final tz.TZDateTime belgiumTime = tz.TZDateTime.from(dateTime, tz.getLocation('Europe/Brussels'));
+
+    final String formattedTime =
+        '${belgiumTime.hour.toString().padLeft(2, '0')}:${belgiumTime.minute.toString().padLeft(2, '0')}';
+
+    final String formattedDate =
+        '${belgiumTime.day.toString().padLeft(2, '0')}/${belgiumTime.month.toString().padLeft(2, '0')}/${belgiumTime.year}';
+
+    return '$formattedDate $formattedTime';
   }
 }
