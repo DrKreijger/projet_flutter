@@ -45,5 +45,13 @@ class OrderRepository {
     return null;
   }
 
+  Future<void> updateOrderValidation(String orderId, bool newValidationState) async {
+    await firestore.collection('orders').doc(orderId).update({'validated': newValidationState});
+  }
+
+  Future<void> updateOrder(String orderId, Map<String, dynamic> updatedData) async {
+    await firestore.collection('orders').doc(orderId).update(updatedData);
+  }
+
 
 }

@@ -7,58 +7,65 @@ import '../repositories/order_repository.dart';
 class OrderBloc extends Bloc<OrderEvent, OrderState> {
   final OrderRepository orderRepository;
 
-  OrderBloc(this.orderRepository) : super(OrdersLoading()) {
-    on<LoadOrders>((event, emit) async {
-      try {
-        emit(OrdersLoading());
-        final orders = await orderRepository.fetchOrders();
+  OrderBloc(this.orderRepository) : super(const OrdersLoading()) {
+    on<LoadOrders>(_onLoadOrders);
+    on<DeleteOrder>(_onDeleteOrder);
+    on<AddOrder>(_onAddOrder);
+    on<UpdateOrderValidation>(_onUpdateOrderValidation);
+    on<UpdateOrder>(_onUpdateOrder);
+  }
 
-        // Trier les commandes par date dans l'ordre croissant (anciennes d'abord)
-        orders.sort((a, b) => a.reservationDate.compareTo(b.reservationDate));
+  Future<void> _onLoadOrders(LoadOrders event, Emitter<OrderState> emit) async {
+    try {
+      emit(const OrdersLoading());
+      final orders = await orderRepository.fetchOrders();
 
-        emit(OrdersLoaded(orders));
-      } catch (e) {
-        emit(OrdersError('Une erreur s\'est produite lors du chargement des commandes.'));
-      }
-    });
+      // Trier les commandes par date dans l'ordre croissant (anciennes d'abord)
+      orders.sort((a, b) => a.reservationDate.compareTo(b.reservationDate));
 
-    on<DeleteOrder>((event, emit) async {
+      emit(OrdersLoaded(orders: orders));
+    } catch (e) {
+      emit(OrdersError(message: 'Une erreur s\'est produite lors du chargement des commandes : $e'));
+    }
+  }
+
+  Future<void> _onDeleteOrder(DeleteOrder event, Emitter<OrderState> emit) async {
+    try {
       await orderRepository.deleteOrder(event.orderId);
-      add(LoadOrders());
-    });
+      add(LoadOrders()); // Recharger les commandes après suppression
+    } catch (e) {
+      emit(OrdersError(message: 'Erreur lors de la suppression de la commande : $e'));
+    }
+  }
 
-    on<AddOrder>((event, emit) async {
-      try {
-        print('Ajout d\'une commande : ${event.orderData}');
-        await orderRepository.addOrder(event.orderData);
-        // Rafraîchir la liste après ajout
-        add(LoadOrders());
-      } catch (e) {
-        print('Erreur lors de l\'ajout de la commande : $e');
-        emit(OrdersError('Impossible d\'ajouter la commande.'));
-      }
-    });
+  Future<void> _onAddOrder(AddOrder event, Emitter<OrderState> emit) async {
+    try {
+      print('Ajout d\'une commande : ${event.orderData}');
+      await orderRepository.addOrder(event.orderData);
+      add(LoadOrders()); // Recharger les commandes après ajout
+    } catch (e) {
+      print('Erreur lors de l\'ajout de la commande : $e');
+      emit(OrdersError(message: 'Impossible d\'ajouter la commande : $e'));
+    }
+  }
 
-    on<UpdateOrderValidation>((event, emit) async {
-      try {
-        final docRef = FirebaseFirestore.instance.collection('orders').doc(event.orderId);
-        await docRef.update({'validated': event.newValidationState});
-        add(LoadOrders()); // Recharge les commandes pour mettre à jour l'interface
-      } catch (e) {
-        emit(OrdersError('Erreur lors de la mise à jour de la validation : $e'));
-      }
-    });
+  Future<void> _onUpdateOrderValidation(UpdateOrderValidation event, Emitter<OrderState> emit) async {
+    try {
+      final docRef = FirebaseFirestore.instance.collection('orders').doc(event.orderId);
+      await docRef.update({'validated': event.newValidationState});
+      add(LoadOrders()); // Recharger les commandes après mise à jour
+    } catch (e) {
+      emit(OrdersError(message: 'Erreur lors de la mise à jour de la validation : $e'));
+    }
+  }
 
-    on<UpdateOrder>((event, emit) async {
-      try {
-        final docRef = FirebaseFirestore.instance.collection('orders').doc(event.orderId);
-        await docRef.update(event.updatedData);
-        add(LoadOrders()); // Recharge les commandes pour mettre à jour l'interface
-      } catch (e) {
-        emit(OrdersError('Erreur lors de la mise à jour de la commande : $e'));
-      }
-    });
-
-
+  Future<void> _onUpdateOrder(UpdateOrder event, Emitter<OrderState> emit) async {
+    try {
+      final docRef = FirebaseFirestore.instance.collection('orders').doc(event.orderId);
+      await docRef.update(event.updatedData);
+      add(LoadOrders()); // Recharger les commandes après mise à jour
+    } catch (e) {
+      emit(OrdersError(message: 'Erreur lors de la mise à jour de la commande : $e'));
+    }
   }
 }
