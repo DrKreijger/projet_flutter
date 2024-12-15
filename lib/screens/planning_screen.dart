@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../blocs/order_bloc.dart';
 import '../blocs/order_state.dart';
+import '../models/order.dart';
+import '../repositories/driver_repository.dart';
+import 'order_details_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PlanningScreen extends StatelessWidget {
@@ -9,6 +12,8 @@ class PlanningScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final driverRepository = DriverRepository(); // Charger les chauffeurs si nécessaire
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Planning des navettes'),
@@ -26,7 +31,7 @@ class PlanningScreen extends StatelessWidget {
                 endTime: order.departureDate.add(const Duration(hours: 1)),
                 subject: order.clientName,
                 color: order.validated ? Colors.green : Colors.red,
-                notes: order.id,
+                notes: order.id, // Stocke l'ID du bon de commande pour référence
               );
             }).toList();
 
@@ -42,10 +47,26 @@ class PlanningScreen extends StatelessWidget {
               showDatePickerButton: true,
               headerDateFormat: 'MMMM yyyy', // Format du mois en français
               todayHighlightColor: Colors.blue,
-              onTap: (calendarTapDetails) {
+              onTap: (calendarTapDetails) async {
                 if (calendarTapDetails.appointments != null) {
                   final appointment = calendarTapDetails.appointments!.first as Appointment;
-                  print('Clicked appointment: ${appointment.subject}');
+                  final orderId = appointment.notes; // Récupérer l'ID du bon de commande
+
+                  if (orderId != null) {
+                    // Trouver le bon de commande correspondant
+                    final order = state.orders.firstWhere((order) => order.id == orderId);
+
+                    // Récupérer les chauffeurs avant de naviguer vers les détails
+                    final drivers = await driverRepository.fetchDrivers();
+
+                    // Naviguer vers l'écran des détails
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OrderDetailsScreen(order: order, drivers: drivers),
+                      ),
+                    );
+                  }
                 }
               },
               headerStyle: const CalendarHeaderStyle(
