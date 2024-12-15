@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/orders_screen.dart';
 import '../screens/drivers_screen.dart';
+import '../screens/shuttle_planning_screen.dart'; // Nouvel écran à inclure
 
 class BottomNavBar extends StatefulWidget {
   @override
@@ -10,9 +11,11 @@ class BottomNavBar extends StatefulWidget {
 class _BottomNavBarState extends State<BottomNavBar> {
   int _currentIndex = 0;
 
+  // Ajout de l'écran du planning dans la liste des écrans
   final List<Widget> _screens = [
     OrdersScreen(), // Écran des bons de commande
     DriversScreen(), // Écran des chauffeurs
+    ShuttlePlanningScreen(), // Nouvel écran du planning des navettes
   ];
 
   @override
@@ -34,6 +37,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
           BottomNavigationBarItem(
             icon: Icon(Icons.people),
             label: 'Chauffeurs',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Planning',
           ),
         ],
       ),
