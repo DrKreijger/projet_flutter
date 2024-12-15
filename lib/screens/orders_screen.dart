@@ -73,70 +73,84 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   future: getDriver(order.driverId),
                   builder: (context, snapshot) {
                     final driver = snapshot.data;
-                    return Card(
-                      margin: const EdgeInsets.all(8.0),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Client
-                            Text(
-                              'Client : ${order.clientName}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                    return GestureDetector(
+                      onTap: () async {
+                        final drivers = await driverRepository.fetchDrivers();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => OrderDetailsScreen(order: order, drivers: drivers),
+                          ),
+                        );
+                      },
+                      child: Card(
+                        margin: const EdgeInsets.all(8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Client
+                              Text(
+                                'Client : ${order.clientName}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            // Départ
-                            Text(
-                              'Départ : ${formatDateTimeToBelgium(order.departureDate)}',
-                              style: const TextStyle(fontSize: 14, color: Colors.grey),
-                            ),
-                            const SizedBox(height: 8),
-                            // Chauffeur
-                            Text(
-                              'Chauffeur : ${driver?.firstName ?? "Inconnu"} ${driver?.lastName ?? ""}',
-                              style: const TextStyle(fontSize: 14, color: Colors.grey),
-                            ),
-                            const SizedBox(height: 16),
-                            // Boutons
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    order.validated ? Icons.check_circle : Icons.cancel,
-                                    color: order.validated ? Colors.green : Colors.red,
+                              const SizedBox(height: 8),
+                              // Départ
+                              Text(
+                                'Départ : ${formatDateTimeToBelgium(order.departureDate)}',
+                                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                              const SizedBox(height: 8),
+                              // Chauffeur
+                              Text(
+                                'Chauffeur : ${driver?.firstName ?? "Inconnu"} ${driver?.lastName ?? ""}',
+                                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                              const SizedBox(height: 16),
+                              // Boutons
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      order.validated ? Icons.check_circle : Icons.cancel,
+                                      color: order.validated ? Colors.green : Colors.red,
+                                    ),
+                                    onPressed: () {
+                                      context
+                                          .read<OrderBloc>()
+                                          .add(UpdateOrderValidation(order.id, !order.validated));
+                                    },
                                   ),
-                                  onPressed: () {
-                                    context.read<OrderBloc>().add(UpdateOrderValidation(order.id, !order.validated));
-                                  },
-                                ),
-                                const SizedBox(width: 8),
-                                IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.blue),
-                                  onPressed: () async {
-                                    final drivers = await driverRepository.fetchDrivers();
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => OrderFormScreen(order: order, drivers: drivers),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                const SizedBox(width: 8),
-                                IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
-                                  onPressed: () {
-                                    context.read<OrderBloc>().add(DeleteOrder(order.id));
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    icon: const Icon(Icons.edit, color: Colors.blue),
+                                    onPressed: () async {
+                                      final drivers = await driverRepository.fetchDrivers();
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              OrderFormScreen(order: order, drivers: drivers),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () {
+                                      context.read<OrderBloc>().add(DeleteOrder(order.id));
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
