@@ -5,6 +5,7 @@ import '../blocs/order_event.dart';
 import '../blocs/order_state.dart';
 import '../models/order.dart';
 import 'order_form_screen.dart';
+import 'order_details_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/standalone.dart' as tz;
 
@@ -28,7 +29,7 @@ class ShuttlesScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              context.read<OrderBloc>().add(LoadOrders()); // Recharger toutes les commandes
+              context.read<OrderBloc>().add(LoadOrders());
             },
           ),
         ],
@@ -40,7 +41,6 @@ class ShuttlesScreen extends StatelessWidget {
           } else if (state is OrdersError) {
             return Center(child: Text('Erreur : ${state.message}'));
           } else if (state is OrdersLoaded) {
-            // Filtrer les commandes associées au chauffeur
             final filteredOrders = state.orders.where((order) => order.driverId == driverId).toList();
 
             if (filteredOrders.isEmpty) {
@@ -51,65 +51,76 @@ class ShuttlesScreen extends StatelessWidget {
               itemCount: filteredOrders.length,
               itemBuilder: (context, index) {
                 final order = filteredOrders[index];
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Uniformise le padding
-                  title: Text(order.clientName, style: const TextStyle(fontWeight: FontWeight.bold)), // Nom du client
-                  subtitle: Text(
-                    formatDateTimeToBelgium(order.departureDate), // Date de départ
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Icône de validation
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: Icon(
-                            order.validated ? Icons.check_circle : Icons.cancel,
-                            color: order.validated ? Colors.green : Colors.red,
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OrderDetailsScreen(order: order, drivers: []),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.all(8.0),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Client
+                          Text(
+                            'Client : ${order.clientName}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
-                          onPressed: () {
-                            print('Changement d\'état de validation pour la commande ID: ${order.id}');
-                            context.read<OrderBloc>().add(UpdateOrderValidation(order.id, !order.validated));
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8), // Espacement entre les boutons
-                      // Icône d'édition
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => OrderFormScreen(order: order, drivers: []),
+                          const SizedBox(height: 8),
+                          // Départ
+                          Text(
+                            'Départ : ${formatDateTimeToBelgium(order.departureDate)}',
+                            style: const TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 16),
+                          // Boutons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  order.validated ? Icons.check_circle : Icons.cancel,
+                                  color: order.validated ? Colors.green : Colors.red,
+                                ),
+                                onPressed: () {
+                                  context
+                                      .read<OrderBloc>()
+                                      .add(UpdateOrderValidation(order.id, !order.validated));
+                                },
                               ),
-                            );
-                          },
-                        ),
+                              const SizedBox(width: 8),
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.blue),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => OrderFormScreen(order: order, drivers: []),
+                                    ),
+                                  );
+                                },
+                              ),
+                              const SizedBox(width: 8),
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  context.read<OrderBloc>().add(DeleteOrder(order.id));
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 8), // Espacement entre les boutons
-                      // Icône de suppression
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () {
-                            print('Suppression de la commande ID: ${order.id}');
-                            context.read<OrderBloc>().add(DeleteOrder(order.id));
-                          },
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 );
               },
