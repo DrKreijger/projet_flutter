@@ -24,12 +24,28 @@ class OrderDetailsScreen extends StatefulWidget {
 
 class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   late Order order;
+  Driver? driver;
 
   @override
   void initState() {
     super.initState();
     order = widget.order;
+    driver = _getDriverById(order.driverId);
   }
+
+  Driver? _getDriverById(String driverId) {
+    return widget.drivers.firstWhere(
+          (d) => d.id == driverId,
+      orElse: () => Driver(
+        id: '',
+        firstName: 'Non',
+        lastName: 'assigné',
+        email: '',
+        phone: '',
+      ),
+    );
+  }
+
 
   void _updateOrderDetails(BuildContext context) {
     final blocState = context.read<OrderBloc>().state;
@@ -40,6 +56,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
       );
       setState(() {
         order = updatedOrder;
+        driver = _getDriverById(order.driverId);
       });
     }
   }
@@ -77,6 +94,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               ),
               const SizedBox(height: 8),
               Text(
+                'Chauffeur : ${driver != null ? "${driver!.firstName} ${driver!.lastName}" : "Non assigné"}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
                 'État de validation : ${order.validated ? "Validé" : "Non validé"}',
                 style: TextStyle(
                   fontSize: 16,
@@ -92,8 +114,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             final result = await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) =>
-                    OrderFormScreen(order: order, drivers: widget.drivers),
+                builder: (_) => OrderFormScreen(order: order, drivers: widget.drivers),
               ),
             );
 
