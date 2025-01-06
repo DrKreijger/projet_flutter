@@ -78,6 +78,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
+                'Date de réservation : ${formatDateTimeToBelgium(order.reservationDate)}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
                 'Client : ${order.clientName}',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
@@ -93,6 +98,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               ),
               const SizedBox(height: 8),
               Text(
+                'Date de départ : ${formatDateTimeToBelgium(order.departureDate)}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
                 'Aéroport : ${order.airport}',
                 style: const TextStyle(fontSize: 16),
               ),
@@ -103,22 +113,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Prix : ${order.price.toStringAsFixed(2)} €',
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Date de réservation : ${formatDateTimeToBelgium(order.reservationDate)}',
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Date de départ : ${formatDateTimeToBelgium(order.departureDate)}',
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Text(
                 'Chauffeur : ${driver != null ? "${driver!.firstName} ${driver!.lastName}" : "Non assigné"}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Prix : ${order.price.toStringAsFixed(2)} €',
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
