@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../models/driver.dart';
-import '../repositories/driver_repository.dart';
+import '../../models/driver.dart';
+import '../../repositories/driver_repository.dart';
 
 part 'driver_event.dart';
 part 'driver_state.dart';

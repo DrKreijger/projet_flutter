@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:timezone/timezone.dart' as tz;
-import '../blocs/order_event.dart';
-import '../models/order.dart';
-import '../models/driver.dart';
-import '../blocs/order_bloc.dart';
-import '../blocs/order_state.dart';
+import '../../blocs/order/order_event.dart';
+import '../../models/order.dart';
+import '../../models/driver.dart';
+import '../../blocs/order/order_bloc.dart';
+import '../../blocs/order/order_state.dart';
 import 'order_form_screen.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
@@ -41,11 +41,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         firstName: 'Non',
         lastName: 'assigné',
         email: '',
-        phone: '',
+        phoneNumber: '',
       ),
     );
   }
-
 
   void _updateOrderDetails(BuildContext context) {
     final blocState = context.read<OrderBloc>().state;
@@ -79,12 +78,22 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
+                'Date de réservation : ${formatDateTimeToBelgium(order.reservationDate)}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
                 'Client : ${order.clientName}',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                'Date de réservation : ${formatDateTimeToBelgium(order.reservationDate)}',
+                'Adresse : ${order.clientAddress}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Téléphone : ${order.clientPhone}',
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
@@ -94,7 +103,22 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               ),
               const SizedBox(height: 8),
               Text(
+                'Aéroport : ${order.airport}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Nombre de personnes : ${order.numberOfPeople}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
                 'Chauffeur : ${driver != null ? "${driver!.firstName} ${driver!.lastName}" : "Non assigné"}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Prix : ${order.price.toStringAsFixed(2)} €',
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),

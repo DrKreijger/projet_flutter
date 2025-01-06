@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/driver_bloc.dart';
-import '../models/driver.dart';
+import '../../blocs/driver/driver_bloc.dart';
+import '../../models/driver.dart';
 
 class DriverFormScreen extends StatefulWidget {
   final Driver? driver; // Si null, c'est pour ajouter un chauffeur, sinon pour éditer
@@ -26,7 +26,7 @@ class _DriverFormScreenState extends State<DriverFormScreen> {
       firstNameController.text = widget.driver!.firstName;
       lastNameController.text = widget.driver!.lastName;
       emailController.text = widget.driver!.email; // Charger l'email existant
-      phoneController.text = widget.driver!.phone; // Charger le téléphone existant
+      phoneController.text = widget.driver!.phoneNumber; // Charger le téléphone existant
     }
   }
 
@@ -76,7 +76,7 @@ class _DriverFormScreenState extends State<DriverFormScreen> {
                       'firstName': firstNameController.text,
                       'lastName': lastNameController.text,
                       'email': emailController.text,
-                      'phone': phoneController.text,
+                      'phoneNumber': phoneController.text,
                     };
 
                     if (widget.driver == null) {

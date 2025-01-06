@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/driver_bloc.dart';
-import '../models/driver.dart';
+import '../../blocs/driver/driver_bloc.dart';
+import '../../models/driver.dart';
 import 'driver_form_screen.dart';
 import 'driver_details_screen.dart';
-import 'shuttles_screen.dart';
+import '../shuttles_screen.dart';
 
 class DriversScreen extends StatelessWidget {
   @override
@@ -67,7 +67,7 @@ class DriversScreen extends StatelessWidget {
                           const SizedBox(height: 8),
                           // Numéro de téléphone
                           Text(
-                            'Téléphone : ${driver.phone}',
+                            'Téléphone : ${driver.phoneNumber}',
                             style: const TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                           const SizedBox(height: 16),

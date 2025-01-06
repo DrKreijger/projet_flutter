@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'order_event.dart';
 import 'order_state.dart';
-import '../repositories/order_repository.dart';
-import '../models/order.dart';
+import '../../repositories/order_repository.dart';
+import '../../models/order.dart';
 
 class OrderBloc extends Bloc<OrderEvent, OrderState> {
   final OrderRepository orderRepository;

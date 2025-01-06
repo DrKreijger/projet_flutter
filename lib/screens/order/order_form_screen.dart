@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/order_bloc.dart';
-import '../blocs/order_event.dart';
-import '../models/driver.dart';
-import '../models/order.dart';
+import '../../blocs/order/order_bloc.dart';
+import '../../blocs/order/order_event.dart';
+import '../../models/driver.dart';
+import '../../models/order.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/standalone.dart' as tz;
 
@@ -25,6 +25,11 @@ String formatDateTimeToBelgium(DateTime dateTime) {
 class _OrderFormScreenState extends State<OrderFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _clientNameController;
+  late TextEditingController _clientAddressController;
+  late TextEditingController _clientPhoneController;
+  late TextEditingController _airportController;
+  late TextEditingController _numberOfPeopleController;
+  late TextEditingController _priceController;
   late DateTime _reservationDate;
   late DateTime _departureDate;
   String? _selectedDriverId;
@@ -34,6 +39,13 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   void initState() {
     super.initState();
     _clientNameController = TextEditingController(text: widget.order?.clientName ?? '');
+    _clientAddressController = TextEditingController(text: widget.order?.clientAddress ?? '');
+    _clientPhoneController = TextEditingController(text: widget.order?.clientPhone ?? '');
+    _airportController = TextEditingController(text: widget.order?.airport ?? '');
+    _numberOfPeopleController = TextEditingController(
+        text: widget.order?.numberOfPeople != null ? widget.order!.numberOfPeople.toString() : '');
+    _priceController = TextEditingController(
+        text: widget.order?.price != null ? widget.order!.price.toStringAsFixed(2) : '');
     _reservationDate = widget.order?.reservationDate ?? DateTime.now();
     _departureDate = widget.order?.departureDate ?? DateTime.now();
     _selectedDriverId = widget.order?.driverId ?? (widget.drivers.isNotEmpty ? widget.drivers[0].id : null);
@@ -43,6 +55,11 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   @override
   void dispose() {
     _clientNameController.dispose();
+    _clientAddressController.dispose();
+    _clientPhoneController.dispose();
+    _airportController.dispose();
+    _numberOfPeopleController.dispose();
+    _priceController.dispose();
     super.dispose();
   }
 
@@ -79,6 +96,11 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       final newOrder = Order(
         id: widget.order?.id ?? '',
         clientName: _clientNameController.text,
+        clientAddress: _clientAddressController.text,
+        clientPhone: _clientPhoneController.text,
+        airport: _airportController.text,
+        numberOfPeople: int.parse(_numberOfPeopleController.text),
+        price: double.parse(_priceController.text),
         reservationDate: _reservationDate,
         departureDate: _departureDate,
         driverId: _selectedDriverId ?? '',
@@ -108,30 +130,12 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Date de réservation :'),
-                    Text(
-                      formatDateTimeToBelgium(_reservationDate),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
+                _buildTextField(_clientNameController, 'Nom du client', 'Veuillez entrer un nom de client'),
                 const SizedBox(height: 16),
-                // Nom du client
-                TextFormField(
-                  controller: _clientNameController,
-                  decoration: const InputDecoration(labelText: 'Nom du client'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez entrer un nom de client';
-                    }
-                    return null;
-                  },
-                ),
+                _buildTextField(_clientAddressController, 'Adresse du client', 'Veuillez entrer une adresse'),
                 const SizedBox(height: 16),
-                // Date de départ (avec sélecteur)
+                _buildTextField(_clientPhoneController, 'Téléphone du client', 'Veuillez entrer un numéro valide'),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     const Text('Date de départ :'),
@@ -146,7 +150,11 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                // Sélecteur de chauffeur
+                _buildTextField(_airportController, 'Aéroport', 'Veuillez entrer un aéroport'),
+                const SizedBox(height: 16),
+                _buildTextField(_numberOfPeopleController, 'Nombre de personnes', 'Veuillez entrer un nombre',
+                    keyboardType: TextInputType.number),
+                const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: _selectedDriverId,
                   items: widget.drivers.map((driver) {
@@ -163,7 +171,9 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                   decoration: const InputDecoration(labelText: 'Chauffeur'),
                 ),
                 const SizedBox(height: 16),
-                // Switch pour la validation
+                _buildTextField(_priceController, 'Prix', 'Veuillez entrer un prix',
+                    keyboardType: TextInputType.number),
+                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -179,7 +189,6 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                   ],
                 ),
                 const SizedBox(height: 32),
-                // Bouton pour sauvegarder
                 ElevatedButton(
                   onPressed: _saveForm,
                   child: Text(widget.order == null ? 'Ajouter' : 'Enregistrer'),
@@ -189,6 +198,21 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label, String error,
+      {TextInputType keyboardType = TextInputType.text}) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(labelText: label),
+      keyboardType: keyboardType,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return error;
+        }
+        return null;
+      },
     );
   }
 }

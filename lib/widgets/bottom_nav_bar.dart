@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../screens/orders_screen.dart';
-import '../screens/drivers_screen.dart';
+import '../screens/order/orders_screen.dart';
+import '../screens/driver/drivers_screen.dart';
 import '../screens/planning_screen.dart'; // Nouvel écran à inclure
 
 class BottomNavBar extends StatefulWidget {

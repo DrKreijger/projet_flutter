@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:projet_flutter/widgets/bottom_nav_bar.dart';
-import 'blocs/order_bloc.dart';
-import 'blocs/order_event.dart';
-import 'blocs/driver_bloc.dart';
+import 'blocs/calendar_bloc.dart';
+import 'blocs/order/order_bloc.dart';
+import 'blocs/order/order_event.dart';
+import 'blocs/driver/driver_bloc.dart';
 import 'repositories/order_repository.dart';
 import 'repositories/driver_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,6 +37,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<DriverBloc>(
           create: (context) => DriverBloc(driverRepository: driverRepository)..add(LoadDrivers()), // Ajout de l'événement LoadDrivers
+        ),
+        BlocProvider<CalendarBloc>(
+          create: (_) => CalendarBloc(),
         ),
       ],
       child: MaterialApp(
