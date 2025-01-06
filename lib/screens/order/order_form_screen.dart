@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/order_bloc.dart';
-import '../blocs/order_event.dart';
-import '../models/driver.dart';
-import '../models/order.dart';
+import '../../blocs/order/order_bloc.dart';
+import '../../blocs/order/order_event.dart';
+import '../../models/driver.dart';
+import '../../models/order.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/standalone.dart' as tz;
 

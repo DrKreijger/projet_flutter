@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../models/driver.dart';
-import '../blocs/driver_bloc.dart';
+import '../../models/driver.dart';
+import '../../blocs/driver/driver_bloc.dart';
 import 'driver_form_screen.dart';
 
 class DriverDetailsScreen extends StatefulWidget {

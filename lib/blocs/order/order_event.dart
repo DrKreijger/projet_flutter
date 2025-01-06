@@ -1,4 +1,4 @@
-import '../models/order.dart';
+import '../../models/order.dart';
 
 abstract class OrderEvent {}
 

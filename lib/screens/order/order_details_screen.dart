@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:timezone/timezone.dart' as tz;
-import '../blocs/order_event.dart';
-import '../models/order.dart';
-import '../models/driver.dart';
-import '../blocs/order_bloc.dart';
-import '../blocs/order_state.dart';
+import '../../blocs/order/order_event.dart';
+import '../../models/order.dart';
+import '../../models/driver.dart';
+import '../../blocs/order/order_bloc.dart';
+import '../../blocs/order/order_state.dart';
 import 'order_form_screen.dart';
 
 class OrderDetailsScreen extends StatefulWidget {

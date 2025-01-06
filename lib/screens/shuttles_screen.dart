@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/order_bloc.dart';
-import '../blocs/order_event.dart';
-import '../blocs/order_state.dart';
+import '../blocs/order/order_bloc.dart';
+import '../blocs/order/order_event.dart';
+import '../blocs/order/order_state.dart';
 import '../models/order.dart';
-import 'order_form_screen.dart';
-import 'order_details_screen.dart';
+import 'order/order_form_screen.dart';
+import 'order/order_details_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/standalone.dart' as tz;
 

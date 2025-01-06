@@ -1,4 +1,4 @@
-import '../models/order.dart';
+import '../../models/order.dart';
 
 abstract class OrderState {
   const OrderState(); // Utilisation d'un constructeur constant pour les classes abstraites

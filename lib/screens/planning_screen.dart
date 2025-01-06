@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-import '../blocs/order_bloc.dart';
-import '../blocs/order_event.dart';
-import '../blocs/order_state.dart';
+import '../blocs/order/order_bloc.dart';
+import '../blocs/order/order_event.dart';
+import '../blocs/order/order_state.dart';
 import '../models/order.dart';
 import '../repositories/driver_repository.dart';
-import 'order_details_screen.dart';
+import 'order/order_details_screen.dart';
 import '../blocs/calendar_bloc.dart';
 
 class PlanningScreen extends StatelessWidget {
