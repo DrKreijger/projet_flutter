@@ -41,7 +41,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         firstName: 'Non',
         lastName: 'assigné',
         email: '',
-        phone: '',
+        phoneNumber: '',
       ),
     );
   }

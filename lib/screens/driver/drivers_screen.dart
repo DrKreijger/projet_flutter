@@ -67,7 +67,7 @@ class DriversScreen extends StatelessWidget {
                           const SizedBox(height: 8),
                           // Numéro de téléphone
                           Text(
-                            'Téléphone : ${driver.phone}',
+                            'Téléphone : ${driver.phoneNumber}',
                             style: const TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                           const SizedBox(height: 16),

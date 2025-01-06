@@ -3,14 +3,14 @@ class Driver {
   final String firstName;
   final String lastName;
   final String email; // Nouveau champ
-  final String phone; // Nouveau champ
+  final String phoneNumber; // Nouveau champ
 
   Driver({
     required this.id,
     required this.firstName,
     required this.lastName,
     required this.email,
-    required this.phone,
+    required this.phoneNumber,
   });
 
   factory Driver.fromMap(Map<String, dynamic> map, String id) {
@@ -19,7 +19,7 @@ class Driver {
       firstName: map['firstName'] ?? 'Inconnu',
       lastName: map['lastName'] ?? 'Inconnu',
       email: map['email'] ?? 'Inconnu', // Par défaut "Inconnu"
-      phone: map['phone'] ?? 'Inconnu', // Par défaut "Inconnu"
+      phoneNumber: map['phoneNumber'] ?? 'Inconnu', // Par défaut "Inconnu"
     );
   }
 
@@ -28,7 +28,7 @@ class Driver {
       'firstName': firstName,
       'lastName': lastName,
       'email': email, // Ajoute l'email
-      'phone': phone, // Ajoute le numéro de téléphone
+      'phoneNumber': phoneNumber, // Ajoute le numéro de téléphone
     };
   }
 }

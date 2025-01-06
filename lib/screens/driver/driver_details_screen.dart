@@ -62,7 +62,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Numéro de téléphone : ${driver.phone}',
+                'Numéro de téléphone : ${driver.phoneNumber}',
                 style: const TextStyle(fontSize: 16),
               ),
             ],
