@@ -136,14 +136,6 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                 const SizedBox(height: 16),
                 _buildTextField(_clientPhoneController, 'Téléphone du client', 'Veuillez entrer un numéro valide'),
                 const SizedBox(height: 16),
-                _buildTextField(_airportController, 'Aéroport', 'Veuillez entrer un aéroport'),
-                const SizedBox(height: 16),
-                _buildTextField(_numberOfPeopleController, 'Nombre de personnes', 'Veuillez entrer un nombre',
-                    keyboardType: TextInputType.number),
-                const SizedBox(height: 16),
-                _buildTextField(_priceController, 'Prix', 'Veuillez entrer un prix',
-                    keyboardType: TextInputType.number),
-                const SizedBox(height: 16),
                 Row(
                   children: [
                     const Text('Date de départ :'),
@@ -157,6 +149,11 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                _buildTextField(_airportController, 'Aéroport', 'Veuillez entrer un aéroport'),
+                const SizedBox(height: 16),
+                _buildTextField(_numberOfPeopleController, 'Nombre de personnes', 'Veuillez entrer un nombre',
+                    keyboardType: TextInputType.number),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: _selectedDriverId,
@@ -173,6 +170,9 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                   },
                   decoration: const InputDecoration(labelText: 'Chauffeur'),
                 ),
+                const SizedBox(height: 16),
+                _buildTextField(_priceController, 'Prix', 'Veuillez entrer un prix',
+                    keyboardType: TextInputType.number),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
