@@ -46,7 +46,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     );
   }
 
-
   void _updateOrderDetails(BuildContext context) {
     final blocState = context.read<OrderBloc>().state;
     if (blocState is OrdersLoaded) {
@@ -81,6 +80,31 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               Text(
                 'Client : ${order.clientName}',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Adresse : ${order.clientAddress}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Téléphone : ${order.clientPhone}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Aéroport : ${order.airport}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Nombre de personnes : ${order.numberOfPeople}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Prix : ${order.price.toStringAsFixed(2)} €',
+                style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
               Text(
